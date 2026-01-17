@@ -1,0 +1,31 @@
+{
+  "tests": [
+    {
+      "name": "Get comments for product",
+      "method": "GET",
+      "path": "/?action=get&product_id=test-product",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Add comment",
+      "method": "POST",
+      "path": "/?action=add",
+      "body": {
+        "product_id": "test-product",
+        "user_id": 1,
+        "comment_text": "Отличный товар!",
+        "rating": 5
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "message": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

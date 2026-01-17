@@ -1,4 +1,6 @@
 {
+  "auth": "https://functions.poehali.dev/47caf675-6de2-4d1b-9cfe-23c33bf746a5",
+  "comments": "https://functions.poehali.dev/84b1b70f-3f6b-4a53-9bf1-90ab4105614a",
   "chatgpt-polza-chatgpt": "https://functions.poehali.dev/3c115f5c-25e5-4192-8593-f6eee519eb23",
   "payment": "https://functions.poehali.dev/e0bf1917-6e0d-4d9f-9e79-254850a97db0"
 }

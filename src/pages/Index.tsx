@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import { AuthModal } from '@/components/AuthModal';
+import { ProductComments } from '@/components/ProductComments';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 import Icon from '@/components/ui/icon';
 
@@ -20,6 +23,10 @@ type Product = {
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [authToken, setAuthToken] = useState<string>('');
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   
   const products: Product[] = [
     {
@@ -119,6 +126,20 @@ const Index = () => {
     document.getElementById(section)?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleAuthSuccess = (userData: any, token: string) => {
+    setUser(userData);
+    setAuthToken(token);
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', token);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setAuthToken('');
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <nav className="fixed top-0 w-full z-50 bg-card/95 backdrop-blur-sm border-b border-border">
@@ -147,6 +168,19 @@ const Index = () => {
                    section === 'about' ? 'О нас' : 'Отзывы'}
                 </button>
               ))}
+              {user ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium">{user.username}</span>
+                  <Button size="sm" variant="outline" onClick={handleLogout}>
+                    <Icon name="LogOut" size={16} />
+                  </Button>
+                </div>
+              ) : (
+                <Button size="sm" onClick={() => setIsAuthModalOpen(true)}>
+                  <Icon name="User" size={16} />
+                  <span className="ml-2">Войти</span>
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -252,7 +286,7 @@ const Index = () => {
                           <CardDescription className="text-base">{product.description}</CardDescription>
                         </CardHeader>
                         <CardContent>
-                          <div className="flex justify-between items-center">
+                          <div className="flex justify-between items-center mb-4">
                             <div>
                               <p className="text-3xl font-bold text-primary">{product.price}₽</p>
                             </div>
@@ -265,6 +299,15 @@ const Index = () => {
                               <span className="ml-2">{isProcessing ? 'Обработка...' : 'Купить'}</span>
                             </Button>
                           </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full"
+                            onClick={() => setSelectedProduct(product)}
+                          >
+                            <Icon name="MessageCircle" size={16} />
+                            <span className="ml-2">Отзывы</span>
+                          </Button>
                         </CardContent>
                       </Card>
                     ))}
@@ -369,6 +412,31 @@ const Index = () => {
           <p className="text-sm text-muted-foreground mt-6">© 2026 MCShop. Все права защищены.</p>
         </div>
       </footer>
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={handleAuthSuccess}
+      />
+
+      {selectedProduct && (
+        <Dialog open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{selectedProduct.name}</DialogTitle>
+              <DialogDescription>{selectedProduct.description}</DialogDescription>
+            </DialogHeader>
+            <ProductComments
+              productId={selectedProduct.id}
+              user={user}
+              onLoginClick={() => {
+                setSelectedProduct(null);
+                setIsAuthModalOpen(true);
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
