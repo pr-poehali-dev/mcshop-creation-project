@@ -31,6 +31,21 @@ const Index = () => {
       badge: 'Популярный'
     },
     {
+      id: 'dragon-donate',
+      name: 'Донат Dragon',
+      price: 350,
+      description: 'Эксклюзивный донат Dragon для сервера SeroWorld с уникальными возможностями',
+      category: 'donate',
+      badge: 'Новинка'
+    },
+    {
+      id: 'fair-donate',
+      name: 'Донат FAIR',
+      price: 400,
+      description: 'Донат FAIR для IriskaWorld с расширенными привилегиями и бонусами',
+      category: 'donate'
+    },
+    {
       id: 'charm-account',
       name: 'Аккаунт CharmGrief',
       price: 450,
@@ -42,7 +57,7 @@ const Index = () => {
       id: 'styt-account',
       name: 'Аккаунт STYT',
       price: 500,
-      description: 'Ник STYT с донатом Д.Хелпера на CharmGrief (почти фулл права хелпера) + донат Dragon на SeroWorld',
+      description: 'Ник STYT с донатом Д.Хелпера на CharmGrief (почти фулл права хелпера)',
       category: 'account',
       badge: 'Топ'
     },
