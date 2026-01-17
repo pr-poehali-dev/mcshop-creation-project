@@ -1,12 +1,391 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import Icon from '@/components/ui/icon';
+
+type Product = {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  category: 'donate' | 'account';
+  badge?: string;
+};
+
+type Order = {
+  id: string;
+  product: string;
+  date: string;
+  status: 'completed' | 'pending';
+  price: number;
+};
 
 const Index = () => {
+  const [activeSection, setActiveSection] = useState('home');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  const products: Product[] = [
+    {
+      id: 'nill-donate',
+      name: 'Донат NILL',
+      price: 600,
+      description: 'Премиум донат для сервера IriskaWorld с эксклюзивными привилегиями',
+      category: 'donate',
+      badge: 'Популярный'
+    },
+    {
+      id: 'charm-account',
+      name: 'Аккаунт CharmGrief',
+      price: 450,
+      description: 'Полный доступ к серверу CharmGrief с премиум статусом',
+      category: 'account',
+      badge: 'Новинка'
+    }
+  ];
+
+  const mockOrders: Order[] = [
+    {
+      id: '1',
+      product: 'Донат NILL',
+      date: '15.01.2026',
+      status: 'completed',
+      price: 600
+    },
+    {
+      id: '2',
+      product: 'Аккаунт CharmGrief',
+      date: '10.01.2026',
+      status: 'completed',
+      price: 450
+    }
+  ];
+
+  const reviews = [
+    { id: 1, author: 'Steve_228', rating: 5, text: 'Отличный магазин! Донат пришёл мгновенно, всё работает.' },
+    { id: 2, author: 'Herobrine_Pro', rating: 5, text: 'Купил аккаунт для CharmGrief, всё чётко, рекомендую!' },
+    { id: 3, author: 'Creeper_King', rating: 4, text: 'Хороший сервис, быстрая доставка, цены адекватные.' }
+  ];
+
+  const scrollToSection = (section: string) => {
+    setActiveSection(section);
+    document.getElementById(section)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4 color-black text-black">Добро пожаловать!</h1>
-        <p className="text-xl text-gray-600">тут будет отображаться ваш проект</p>
-      </div>
+    <div className="min-h-screen bg-background text-foreground">
+      <nav className="fixed top-0 w-full z-50 bg-card/95 backdrop-blur-sm border-b border-border">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="w-10 h-10 bg-primary pixel-corners flex items-center justify-center text-2xl">
+                🎮
+              </div>
+              <h1 className="text-2xl font-bold text-glow">MCShop</h1>
+            </div>
+            
+            <div className="hidden md:flex items-center space-x-6">
+              {['home', 'products', 'about', 'reviews'].map((section) => (
+                <button
+                  key={section}
+                  onClick={() => scrollToSection(section)}
+                  className={`text-sm font-medium transition-colors hover:text-primary ${
+                    activeSection === section ? 'text-primary' : 'text-muted-foreground'
+                  }`}
+                >
+                  {section === 'home' ? 'Главная' : 
+                   section === 'products' ? 'Товары' :
+                   section === 'about' ? 'О нас' : 'Отзывы'}
+                </button>
+              ))}
+            </div>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="pixel-corners hover-scale">
+                  <Icon name="User" size={18} />
+                  <span className="ml-2">Личный кабинет</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>Личный кабинет</DialogTitle>
+                  <DialogDescription>
+                    История ваших покупок и заказов
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <div className="space-y-4 mt-4">
+                  {!isLoggedIn ? (
+                    <div className="text-center py-8">
+                      <Icon name="UserCircle" size={48} className="mx-auto mb-4 text-muted-foreground" />
+                      <p className="text-muted-foreground mb-4">Войдите, чтобы увидеть историю покупок</p>
+                      <Button onClick={() => setIsLoggedIn(true)} className="pixel-corners">
+                        Войти как Demo User
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center space-x-4 p-4 bg-muted rounded-lg">
+                        <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-2xl">
+                          👤
+                        </div>
+                        <div>
+                          <p className="font-semibold">Demo User</p>
+                          <p className="text-sm text-muted-foreground">demo@mcshop.ru</p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="font-semibold mb-3 flex items-center">
+                          <Icon name="ShoppingBag" size={20} className="mr-2" />
+                          История заказов
+                        </h3>
+                        <div className="space-y-2">
+                          {mockOrders.map((order) => (
+                            <div key={order.id} className="p-3 bg-muted rounded-lg flex justify-between items-center">
+                              <div>
+                                <p className="font-medium">{order.product}</p>
+                                <p className="text-sm text-muted-foreground">{order.date}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-semibold text-primary">{order.price}₽</p>
+                                <Badge variant={order.status === 'completed' ? 'default' : 'secondary'}>
+                                  {order.status === 'completed' ? 'Выполнен' : 'В обработке'}
+                                </Badge>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <Button 
+                        onClick={() => setIsLoggedIn(false)} 
+                        variant="outline" 
+                        className="w-full"
+                      >
+                        Выйти
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+      </nav>
+
+      <section id="home" className="pt-32 pb-20 px-4">
+        <div className="container mx-auto text-center">
+          <div className="mb-8 inline-block">
+            <div className="w-32 h-32 bg-gradient-to-br from-primary to-secondary pixel-corners mx-auto mb-6 flex items-center justify-center text-6xl glow-effect">
+              ⛏️
+            </div>
+          </div>
+          <h2 className="text-5xl md:text-7xl font-bold mb-6 text-glow">
+            Всё для Minecraft
+          </h2>
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Донаты, аккаунты и привилегии для популярных серверов. Мгновенная доставка, безопасные платежи.
+          </p>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Button 
+              size="lg" 
+              className="pixel-corners hover-scale text-lg"
+              onClick={() => scrollToSection('products')}
+            >
+              <Icon name="ShoppingCart" size={20} />
+              <span className="ml-2">Перейти в магазин</span>
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="pixel-corners hover-scale text-lg"
+              onClick={() => scrollToSection('about')}
+            >
+              <Icon name="Info" size={20} />
+              <span className="ml-2">Узнать больше</span>
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
+            <Card className="pixel-corners hover-scale bg-card/50 backdrop-blur">
+              <CardHeader>
+                <div className="text-4xl mb-2">⚡</div>
+                <CardTitle>Мгновенная доставка</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Получите товар сразу после оплаты</p>
+              </CardContent>
+            </Card>
+            <Card className="pixel-corners hover-scale bg-card/50 backdrop-blur">
+              <CardHeader>
+                <div className="text-4xl mb-2">🔒</div>
+                <CardTitle>Безопасность</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Защищённые платежи и гарантия качества</p>
+              </CardContent>
+            </Card>
+            <Card className="pixel-corners hover-scale bg-card/50 backdrop-blur">
+              <CardHeader>
+                <div className="text-4xl mb-2">💬</div>
+                <CardTitle>Поддержка 24/7</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Всегда готовы помочь с любым вопросом</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <section id="products" className="py-20 px-4 bg-muted/30">
+        <div className="container mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-12 text-glow">Наши товары</h2>
+          
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8">
+              <TabsTrigger value="all">Все</TabsTrigger>
+              <TabsTrigger value="donate">Донаты</TabsTrigger>
+              <TabsTrigger value="account">Аккаунты</TabsTrigger>
+            </TabsList>
+            
+            {['all', 'donate', 'account'].map((tab) => (
+              <TabsContent key={tab} value={tab} className="mt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {products
+                    .filter(p => tab === 'all' || p.category === tab)
+                    .map((product) => (
+                      <Card key={product.id} className="pixel-corners hover-scale overflow-hidden border-2 border-border hover:border-primary transition-colors">
+                        <CardHeader>
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <CardTitle className="text-2xl mb-2">{product.name}</CardTitle>
+                              {product.badge && (
+                                <Badge className="mb-2">{product.badge}</Badge>
+                              )}
+                            </div>
+                            <div className="text-3xl">
+                              {product.category === 'donate' ? '💎' : '👤'}
+                            </div>
+                          </div>
+                          <CardDescription className="text-base">{product.description}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <p className="text-3xl font-bold text-primary">{product.price}₽</p>
+                            </div>
+                            <Button className="pixel-corners hover-scale">
+                              <Icon name="ShoppingCart" size={18} />
+                              <span className="ml-2">Купить</span>
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
+        </div>
+      </section>
+
+      <section id="about" className="py-20 px-4">
+        <div className="container mx-auto max-w-4xl">
+          <h2 className="text-4xl font-bold text-center mb-12 text-glow">О нас</h2>
+          <Card className="pixel-corners p-8">
+            <div className="prose prose-invert max-w-none">
+              <p className="text-lg text-muted-foreground mb-4">
+                MCShop — это надёжный магазин товаров для Minecraft с многолетним опытом работы. 
+                Мы специализируемся на продаже донатов и аккаунтов для популярных серверов.
+              </p>
+              <div className="grid md:grid-cols-2 gap-6 mt-8">
+                <div className="flex items-start space-x-4">
+                  <div className="text-3xl">✅</div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">Проверенное качество</h3>
+                    <p className="text-muted-foreground">Все товары тщательно проверены перед продажей</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <div className="text-3xl">🚀</div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">Быстрая доставка</h3>
+                    <p className="text-muted-foreground">Автоматическая выдача товара после оплаты</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <div className="text-3xl">💰</div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">Честные цены</h3>
+                    <p className="text-muted-foreground">Лучшие цены на рынке без скрытых комиссий</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <div className="text-3xl">🛡️</div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">Гарантия возврата</h3>
+                    <p className="text-muted-foreground">Вернём деньги, если что-то пойдёт не так</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </section>
+
+      <section id="reviews" className="py-20 px-4 bg-muted/30">
+        <div className="container mx-auto max-w-5xl">
+          <h2 className="text-4xl font-bold text-center mb-12 text-glow">Отзывы</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {reviews.map((review) => (
+              <Card key={review.id} className="pixel-corners hover-scale">
+                <CardHeader>
+                  <div className="flex items-center justify-between mb-2">
+                    <CardTitle className="text-lg">{review.author}</CardTitle>
+                    <div className="flex">
+                      {[...Array(review.rating)].map((_, i) => (
+                        <span key={i} className="text-yellow-500">⭐</span>
+                      ))}
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{review.text}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer className="py-12 px-4 border-t border-border">
+        <div className="container mx-auto text-center">
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            <div className="w-10 h-10 bg-primary pixel-corners flex items-center justify-center text-2xl">
+              🎮
+            </div>
+            <h3 className="text-2xl font-bold text-glow">MCShop</h3>
+          </div>
+          <p className="text-muted-foreground mb-4">Всё для Minecraft в одном месте</p>
+          <div className="flex justify-center space-x-6">
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              <Icon name="Mail" size={24} />
+            </a>
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              <Icon name="MessageCircle" size={24} />
+            </a>
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              <Icon name="Send" size={24} />
+            </a>
+          </div>
+          <p className="text-sm text-muted-foreground mt-6">© 2026 MCShop. Все права защищены.</p>
+        </div>
+      </footer>
     </div>
   );
 };
