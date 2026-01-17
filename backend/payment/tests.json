@@ -1,0 +1,29 @@
+{
+  "tests": [
+    {
+      "name": "Create payment redirect",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "productId": "nill-donate",
+        "productName": "Донат NILL",
+        "price": 600
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "telegramUrl": "string",
+        "productId": "string",
+        "productName": "string",
+        "price": "number"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "OPTIONS preflight request",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}

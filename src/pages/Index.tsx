@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+
 import Icon from '@/components/ui/icon';
 
 type Product = {
@@ -15,17 +15,11 @@ type Product = {
   badge?: string;
 };
 
-type Order = {
-  id: string;
-  product: string;
-  date: string;
-  status: 'completed' | 'pending';
-  price: number;
-};
+
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   
   const products: Product[] = [
     {
@@ -40,28 +34,34 @@ const Index = () => {
       id: 'charm-account',
       name: 'Аккаунт CharmGrief',
       price: 450,
-      description: 'Полный доступ к серверу CharmGrief с премиум статусом',
+      description: 'Аккаунт с Д.Хелпером (ограниченный доступ к серверу)',
       category: 'account',
       badge: 'Новинка'
     }
   ];
 
-  const mockOrders: Order[] = [
-    {
-      id: '1',
-      product: 'Донат NILL',
-      date: '15.01.2026',
-      status: 'completed',
-      price: 600
-    },
-    {
-      id: '2',
-      product: 'Аккаунт CharmGrief',
-      date: '10.01.2026',
-      status: 'completed',
-      price: 450
+  const handlePurchase = async (product: Product) => {
+    setIsProcessing(true);
+    try {
+      const response = await fetch('https://functions.poehali.dev/e0bf1917-6e0d-4d9f-9e79-254850a97db0', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: product.id,
+          productName: product.name,
+          price: product.price
+        })
+      });
+      const data = await response.json();
+      if (data.telegramUrl) {
+        window.location.href = data.telegramUrl;
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+    } finally {
+      setIsProcessing(false);
     }
-  ];
+  };
 
   const reviews = [
     { id: 1, author: 'Steve_228', rating: 5, text: 'Отличный магазин! Донат пришёл мгновенно, всё работает.' },
@@ -80,13 +80,15 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-primary pixel-corners flex items-center justify-center text-2xl">
-                🎮
-              </div>
+              <img 
+                src="https://cdn.poehali.dev/projects/7d73a09f-00e1-405b-889e-3434c3398a1f/files/2428c9f2-fabe-42dc-b908-c1cfbf111ac3.jpg" 
+                alt="MCShop Logo" 
+                className="w-10 h-10 pixel-corners object-cover"
+              />
               <h1 className="text-2xl font-bold text-glow">MCShop</h1>
             </div>
             
-            <div className="hidden md:flex items-center space-x-6">
+            <div className="flex items-center space-x-6">
               {['home', 'products', 'about', 'reviews'].map((section) => (
                 <button
                   key={section}
@@ -101,78 +103,6 @@ const Index = () => {
                 </button>
               ))}
             </div>
-
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="pixel-corners hover-scale">
-                  <Icon name="User" size={18} />
-                  <span className="ml-2">Личный кабинет</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-lg">
-                <DialogHeader>
-                  <DialogTitle>Личный кабинет</DialogTitle>
-                  <DialogDescription>
-                    История ваших покупок и заказов
-                  </DialogDescription>
-                </DialogHeader>
-                
-                <div className="space-y-4 mt-4">
-                  {!isLoggedIn ? (
-                    <div className="text-center py-8">
-                      <Icon name="UserCircle" size={48} className="mx-auto mb-4 text-muted-foreground" />
-                      <p className="text-muted-foreground mb-4">Войдите, чтобы увидеть историю покупок</p>
-                      <Button onClick={() => setIsLoggedIn(true)} className="pixel-corners">
-                        Войти как Demo User
-                      </Button>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex items-center space-x-4 p-4 bg-muted rounded-lg">
-                        <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-2xl">
-                          👤
-                        </div>
-                        <div>
-                          <p className="font-semibold">Demo User</p>
-                          <p className="text-sm text-muted-foreground">demo@mcshop.ru</p>
-                        </div>
-                      </div>
-
-                      <div>
-                        <h3 className="font-semibold mb-3 flex items-center">
-                          <Icon name="ShoppingBag" size={20} className="mr-2" />
-                          История заказов
-                        </h3>
-                        <div className="space-y-2">
-                          {mockOrders.map((order) => (
-                            <div key={order.id} className="p-3 bg-muted rounded-lg flex justify-between items-center">
-                              <div>
-                                <p className="font-medium">{order.product}</p>
-                                <p className="text-sm text-muted-foreground">{order.date}</p>
-                              </div>
-                              <div className="text-right">
-                                <p className="font-semibold text-primary">{order.price}₽</p>
-                                <Badge variant={order.status === 'completed' ? 'default' : 'secondary'}>
-                                  {order.status === 'completed' ? 'Выполнен' : 'В обработке'}
-                                </Badge>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <Button 
-                        onClick={() => setIsLoggedIn(false)} 
-                        variant="outline" 
-                        className="w-full"
-                      >
-                        Выйти
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
           </div>
         </div>
       </nav>
@@ -180,9 +110,11 @@ const Index = () => {
       <section id="home" className="pt-32 pb-20 px-4">
         <div className="container mx-auto text-center">
           <div className="mb-8 inline-block">
-            <div className="w-32 h-32 bg-gradient-to-br from-primary to-secondary pixel-corners mx-auto mb-6 flex items-center justify-center text-6xl glow-effect">
-              ⛏️
-            </div>
+            <img 
+              src="https://cdn.poehali.dev/projects/7d73a09f-00e1-405b-889e-3434c3398a1f/files/2428c9f2-fabe-42dc-b908-c1cfbf111ac3.jpg" 
+              alt="MCShop" 
+              className="w-32 h-32 pixel-corners mx-auto mb-6 object-cover glow-effect"
+            />
           </div>
           <h2 className="text-5xl md:text-7xl font-bold mb-6 text-glow">
             Всё для Minecraft
@@ -279,9 +211,13 @@ const Index = () => {
                             <div>
                               <p className="text-3xl font-bold text-primary">{product.price}₽</p>
                             </div>
-                            <Button className="pixel-corners hover-scale">
+                            <Button 
+                              className="pixel-corners hover-scale"
+                              onClick={() => handlePurchase(product)}
+                              disabled={isProcessing}
+                            >
                               <Icon name="ShoppingCart" size={18} />
-                              <span className="ml-2">Купить</span>
+                              <span className="ml-2">{isProcessing ? 'Обработка...' : 'Купить'}</span>
                             </Button>
                           </div>
                         </CardContent>
@@ -366,9 +302,11 @@ const Index = () => {
       <footer className="py-12 px-4 border-t border-border">
         <div className="container mx-auto text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-10 h-10 bg-primary pixel-corners flex items-center justify-center text-2xl">
-              🎮
-            </div>
+            <img 
+              src="https://cdn.poehali.dev/projects/7d73a09f-00e1-405b-889e-3434c3398a1f/files/2428c9f2-fabe-42dc-b908-c1cfbf111ac3.jpg" 
+              alt="MCShop Logo" 
+              className="w-10 h-10 pixel-corners object-cover"
+            />
             <h3 className="text-2xl font-bold text-glow">MCShop</h3>
           </div>
           <p className="text-muted-foreground mb-4">Всё для Minecraft в одном месте</p>
