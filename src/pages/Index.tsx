@@ -37,6 +37,36 @@ const Index = () => {
       description: 'Аккаунт с Д.Хелпером (ограниченный доступ к серверу)',
       category: 'account',
       badge: 'Новинка'
+    },
+    {
+      id: 'styt-account',
+      name: 'Аккаунт STYT',
+      price: 500,
+      description: 'Ник STYT с донатом Д.Хелпера на CharmGrief (почти фулл права хелпера) + донат Dragon на SeroWorld',
+      category: 'account',
+      badge: 'Топ'
+    },
+    {
+      id: 'iriska-premium',
+      name: 'Премиум аккаунт IriskaWorld',
+      price: 450,
+      description: 'Аккаунт с VIP статусом и эксклюзивными возможностями на IriskaWorld',
+      category: 'account'
+    },
+    {
+      id: 'fands-elite',
+      name: 'Elite аккаунт FandsWorld',
+      price: 550,
+      description: 'Элитный аккаунт с уникальными привилегиями и донатами на FandsWorld',
+      category: 'account',
+      badge: 'Редкий'
+    },
+    {
+      id: 'aster-mega',
+      name: 'Mega аккаунт AsterWorld',
+      price: 480,
+      description: 'Аккаунт с Mega статусом и полным набором донатов на AsterWorld',
+      category: 'account'
     }
   ];
 
